@@ -1,0 +1,20 @@
+{
+    "name": "TsLogInsertTool",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc -b",
+        "start": "node dist/index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "yaoyi",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^20.11.5"
+    },
+    "dependencies": {
+        "ts-morph": "^21.0.1"
+    }
+}
