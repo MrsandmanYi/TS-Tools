@@ -31,6 +31,7 @@ echo     "main": "index.js", >> package.json
 echo     "scripts": { >> package.json
 echo         "build": "tsc -b", >> package.json
 echo         "start": "node dist/index.js", >> package.json
+echo         "bs" : "tsc -b && node dist/index.js", >> package.json
 echo         "test": "echo \"Error: no test specified\" && exit 1" >> package.json
 echo     }, >> package.json
 echo     "keywords": [], >> package.json
