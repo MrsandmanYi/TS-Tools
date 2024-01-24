@@ -6,14 +6,14 @@ import { NodeIO } from "@gltf-transform/core";
 //import { createTorusGltf } from "./TorusTest";
 //createTorusGltf();
 
-const filePath = path.resolve(__dirname, "../json/TestJson.json");
+const filePath = path.resolve(__dirname, "../json/trees_map_mainscene_1_SpineMesh.json");
 
 try {
     const jsonData = fs.readFileSync(filePath, "utf-8");
     const parsedData = JSON.parse(jsonData);
     //console.log(jsonData);
 
-    const meshData = ExtractMeshDataFromJson(parsedData);
+    const meshData = ExtractMeshDataFromJson(parsedData[0]);
     const document = CreateGltfDocumentFromMeshData(meshData);
 
     const io = new NodeIO();

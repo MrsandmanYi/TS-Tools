@@ -1,0 +1,113 @@
+{
+  "asset": {
+    "generator": "glTF-Transform v3.10.0",
+    "version": "2.0"
+  },
+  "accessors": [
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 522,
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 198,
+      "max": [
+        318.2803955078125,
+        118.8060531616211,
+        2.200000047683716
+      ],
+      "min": [
+        -19.126365661621094,
+        -50.47529220581055,
+        0
+      ],
+      "bufferView": 1,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 198,
+      "bufferView": 1,
+      "byteOffset": 12
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5126,
+      "count": 198,
+      "bufferView": 1,
+      "byteOffset": 28
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5126,
+      "count": 198,
+      "bufferView": 1,
+      "byteOffset": 36
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1044,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1044,
+      "byteLength": 8712,
+      "byteStride": 44,
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "trees_map_mainscene_1_renderer.bin",
+      "byteLength": 9756
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "trees_map_mainscene_1_renderer",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 1,
+            "TEXCOORD_0": 3,
+            "COLOR_0": 2,
+            "TEXCOORD_1": 4
+          },
+          "mode": 4,
+          "material": 0,
+          "indices": 0
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "MyNode",
+      "mesh": 0
+    }
+  ],
+  "scenes": [
+    {
+      "name": "MyScene",
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}

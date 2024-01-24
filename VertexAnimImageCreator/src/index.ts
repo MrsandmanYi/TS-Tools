@@ -1,13 +1,14 @@
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
+import Jimp from "jimp";
 import { SpineVertAnimImageJson, OutputJson, ImageOutputJson, OutputAnim } from './Interfaces';
 
 
-const filePath = path.resolve(__dirname, "../json/Trees_map_mainscene_1.json");
+const filePath = path.resolve(__dirname, "../json/trees_map_mainscene_1_SpineVertAnim.json");
 
 const GAP_FRAME = 2; // 两个动画之间的空帧数
-const VERTEX_PRECISION = 10.0; // 顶点精度， 顶点的值会乘以这个数值，然后转换成0-255的值
+const VERTEX_PRECISION = 5.0; // 顶点精度， 顶点的值会除以这个数值，然后转换成0-255的值
 
 try {
     const jsonData = fs.readFileSync(filePath, "utf-8");
@@ -15,7 +16,7 @@ try {
 
     let outputJsonData : OutputJson = new OutputJson();
 
-    for (let i = 0; i < parsedData.length; i++) {
+    for (let i = 0; i < parsedData.animJsonArray.length; i++) {
 
         let imageOutputJson = new ImageOutputJson();
         outputJsonData.images.push(imageOutputJson);
@@ -24,7 +25,7 @@ try {
         let width = 0;
         let height = 0;
 
-        let vAnimJson : SpineVertAnimImageJson = parsedData[i];
+        let vAnimJson : SpineVertAnimImageJson = parsedData.animJsonArray[i];
         const imageName = vAnimJson.imageName;
         let anims = vAnimJson.animations;
         for (let j = 0; j < anims.length; j++) {
@@ -65,10 +66,10 @@ try {
                     vertex.y = (vertex.y / VERTEX_PRECISION) + 255.0 / 2.0;
                     vertex.z = (vertex.z / VERTEX_PRECISION) + 255.0 / 2.0; 
 
-                    buffer.writeUInt8(vertex.x, idx); // R
-                    buffer.writeUInt8(vertex.y, idx + 1); // G
-                    buffer.writeUInt8(vertex.z, idx + 2); // B
-                    buffer.writeUInt8(alpha[l] * 255, idx + 3); // A 
+                    buffer.writeUInt8(Math.floor(vertex.x), idx); // R
+                    buffer.writeUInt8(Math.floor(vertex.y), idx + 1); // G
+                    buffer.writeUInt8(Math.floor(vertex.z), idx + 2); // B
+                    buffer.writeUInt8(Math.floor(alpha[l] * 255), idx + 3); // A 
                 }
                 currentRow++;
             }
@@ -87,17 +88,22 @@ try {
             }
         })
         .png({
-            compressionLevel: 9,
             adaptiveFiltering: true,
             force: true,
-            quality: 100
         })
         .toFile(`./output/${imageName}.png`)
         .catch(err => console.error(err));
+
+        // 使用 Jimp 写入buff到文件
+        const image = new Jimp(width, height, (err, image) => {
+            if (err) throw err;
+            image.bitmap.data = buffer;
+            image.write(`./output/${imageName}_jimp.png`);
+        });
     }
 
-    // 到处 outputJsonData 到json文件
-    fs.writeFileSync(`./output/${"xxxxx"}.json`, JSON.stringify(outputJsonData));
+    // 导出 outputJsonData 到json文件
+    fs.writeFileSync(`./output/${parsedData.name}.json`, JSON.stringify(outputJsonData));
 
 } catch (error) {
     console.error("ERROR:", error);

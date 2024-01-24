@@ -1,0 +1,1 @@
+{"images":[{"imageName":"trees_map_mainscene_1_renderer","width":198,"height":260,"animGapFrame":2,"vertexPrecision":5,"animations":[{"animName":"down","frames":{"startFrameIndex":0,"endFrameIndex":91}},{"animName":"hit","frames":{"startFrameIndex":94,"endFrameIndex":135}},{"animName":"idle","frames":{"startFrameIndex":138,"endFrameIndex":259}}]}]}
