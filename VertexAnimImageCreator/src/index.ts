@@ -2,13 +2,14 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import Jimp from "jimp";
+const PNG = require('pngjs').PNG
 import { SpineVertAnimImageJson, OutputJson, ImageOutputJson, OutputAnim } from './Interfaces';
 
 
 const filePath = path.resolve(__dirname, "../json/trees_map_mainscene_1_SpineVertAnim.json");
 
 const GAP_FRAME = 2; // 两个动画之间的空帧数
-const VERTEX_PRECISION = 5.0; // 顶点精度， 顶点的值会除以这个数值，然后转换成0-255的值
+const VERTEX_PRECISION = 80.0; // 顶点精度
 
 try {
     const jsonData = fs.readFileSync(filePath, "utf-8");
@@ -46,7 +47,11 @@ try {
 
         // 根据长宽创建图片png格式，每个像素点存储一个顶点的位置信息 + 透明度信息
         const channels = 4;
-        const buffer = Buffer.alloc(width * height * channels);
+        const buffer = new Uint16Array(width * height * 4);
+
+        const floatBuffer = new Float32Array(width * height * 4);
+
+        const uint16Buffer = new Uint16Array(width * height * 4);
 
         // 将顶点信息和alpha写入到buffer
         let currentRow = 0;
@@ -61,15 +66,29 @@ try {
                 for (let l = 0; l < vertices.length; l++) {
                     let idx = (width * currentRow + l) * 4;
                     let vertex = vertices[l];
-                    // 将顶点信息归一化到0-255
-                    vertex.x = (vertex.x / VERTEX_PRECISION) + 255.0 / 2.0;
-                    vertex.y = (vertex.y / VERTEX_PRECISION) + 255.0 / 2.0;
-                    vertex.z = (vertex.z / VERTEX_PRECISION) + 255.0 / 2.0; 
 
-                    buffer.writeUInt8(Math.floor(vertex.x), idx); // R
-                    buffer.writeUInt8(Math.floor(vertex.y), idx + 1); // G
-                    buffer.writeUInt8(Math.floor(vertex.z), idx + 2); // B
-                    buffer.writeUInt8(Math.floor(alpha[l] * 255), idx + 3); // A 
+                    floatBuffer[idx] = vertex.x;
+                    floatBuffer[idx + 1] = vertex.y;
+                    floatBuffer[idx + 2] = vertex.z;
+                    floatBuffer[idx + 3] = alpha[l];
+
+                    let v  = {x: vertex.x, y: vertex.y, z: vertex.z,a : alpha[l]};
+                    // 将顶点信息归一化到0-65535
+                    v.x = (vertex.x + 400.0) * VERTEX_PRECISION;
+                    v.y = (vertex.y + 400.0) * VERTEX_PRECISION;
+                    v.z = (vertex.z + 400.0) * VERTEX_PRECISION;
+                    v.a = alpha[l] * 65535;
+
+                    buffer[idx] = v.x;
+                    buffer[idx + 1] = v.y;
+                    buffer[idx + 2] = v.z;
+                    buffer[idx + 3] = v.a;
+                    
+                    uint16Buffer[idx] = (v.x + 300) * 100;
+                    uint16Buffer[idx + 1] = (v.y + 100) * 100;
+                    uint16Buffer[idx + 2] = v.z * 2000;
+                    uint16Buffer[idx + 3] = v.a * 2000;
+
                 }
                 currentRow++;
             }
@@ -79,27 +98,28 @@ try {
             currentRow += GAP_FRAME;
         }
 
-        // 将图片写入到文件
-        sharp(buffer, {
-            raw: {
-                width: width,
-                height: height,
-                channels: channels,
-            }
-        })
-        .png({
-            adaptiveFiltering: true,
-            force: true,
-        })
-        .toFile(`./output/${imageName}.png`)
-        .catch(err => console.error(err));
-
-        // 使用 Jimp 写入buff到文件
-        const image = new Jimp(width, height, (err, image) => {
-            if (err) throw err;
-            image.bitmap.data = buffer;
-            image.write(`./output/${imageName}_jimp.png`);
+        // 创建一个 PNG 图像
+        const png = new PNG({
+            width: width,
+            height: height,
+            filterType: -1,
+            colorType: 6,
+            inputHasAlpha: true,
+            bitDepth: 16,
         });
+        png.data = Buffer.from(buffer.buffer);
+        // 将 PNG 图像保存到文件
+        png.pack().pipe(fs.createWriteStream(`./output/${imageName}.png`));
+
+        // 将 buffer 保存到二进制文件保存到本地
+        const bufferFilePath = `./output/${imageName}.bin`;
+        fs.writeFileSync(bufferFilePath, Buffer.from(buffer.buffer));
+        
+        const floatBufferFilePath = `./output/${imageName}_float.bin`;
+        fs.writeFileSync(floatBufferFilePath, Buffer.from(floatBuffer.buffer));
+
+        const uint16BufferFilePath = `./output/${imageName}_uint16.bin`;
+        fs.writeFileSync(uint16BufferFilePath, Buffer.from(uint16Buffer.buffer));
     }
 
     // 导出 outputJsonData 到json文件
