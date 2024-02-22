@@ -51,6 +51,10 @@ try {
 
         const floatBuffer = new Float32Array(width * height * 4);
 
+        const floatIndexArray : number[] = []
+        const floatIndexMap : Map<number, number> = new Map();
+        const indexArray = new Uint16Array(width * height * 4);
+
         const uint16Buffer = new Uint16Array(width * height * 4);
 
         // 将顶点信息和alpha写入到buffer
@@ -71,6 +75,59 @@ try {
                     floatBuffer[idx + 1] = vertex.y;
                     floatBuffer[idx + 2] = vertex.z;
                     floatBuffer[idx + 3] = alpha[l];
+
+                    let xp = Number(vertex.x.toFixed(2));
+                    let yp = Number(vertex.y.toFixed(2));
+                    let zp = Number(vertex.z.toFixed(2));
+                    let ap = Number(alpha[l].toFixed(2));
+                    if (!floatIndexMap.has(xp)) {
+                        floatIndexMap.set(xp, floatIndexArray.length);
+                        floatIndexArray.push(xp);
+                        indexArray[idx] = floatIndexArray.length - 1;
+                    }
+                    else {
+                        let ii = floatIndexMap.get(xp);
+                        if (ii) {
+                            indexArray[idx] = ii;                            
+                        }
+                    }
+
+                    if (!floatIndexMap.has(yp)) {
+                        floatIndexMap.set(yp, floatIndexArray.length);
+                        floatIndexArray.push(yp);
+                        indexArray[idx + 1] = floatIndexArray.length - 1;
+                    }
+                    else {
+                        let ii = floatIndexMap.get(yp);
+                        if (ii) {
+                            indexArray[idx + 1] = ii;                            
+                        }
+                    }
+
+                    if (!floatIndexMap.has(zp)) {
+                        floatIndexMap.set(zp, floatIndexArray.length);
+                        floatIndexArray.push(zp);
+                        indexArray[idx + 2] = floatIndexArray.length - 1;
+                    }
+                    else {
+                        let ii = floatIndexMap.get(zp);
+                        if (ii) {
+                            indexArray[idx + 2] = ii;                            
+                        }
+                    }
+
+                    if (!floatIndexMap.has(ap)) {
+                        floatIndexMap.set(ap, floatIndexArray.length);
+                        floatIndexArray.push(ap);
+                        indexArray[idx + 3] = floatIndexArray.length - 1;
+                    }
+                    else {
+                        let ii = floatIndexMap.get(ap);
+                        if (ii) {
+                            indexArray[idx + 3] = ii;                            
+                        }
+                    }
+
 
                     let v  = {x: vertex.x, y: vertex.y, z: vertex.z,a : alpha[l]};
                     // 将顶点信息归一化到0-65535
@@ -118,8 +175,17 @@ try {
         const floatBufferFilePath = `./output/${imageName}_float.bin`;
         fs.writeFileSync(floatBufferFilePath, Buffer.from(floatBuffer.buffer));
 
-        const uint16BufferFilePath = `./output/${imageName}_uint16.bin`;
-        fs.writeFileSync(uint16BufferFilePath, Buffer.from(uint16Buffer.buffer));
+        // const uint16BufferFilePath = `./output/${imageName}_uint16.bin`;
+        // fs.writeFileSync(uint16BufferFilePath, Buffer.from(uint16Buffer.buffer));
+
+        const indexArrayFilePath = `./output/${imageName}_index.bin`;
+        fs.writeFileSync(indexArrayFilePath, Buffer.from(indexArray.buffer));
+
+        const floatIndexArrayFilePath = `./output/${imageName}_float_Index.bin`;
+        const floatIndexArrayBuffer = new Float32Array(floatIndexArray);
+        fs.writeFileSync(floatIndexArrayFilePath, Buffer.from(floatIndexArrayBuffer.buffer));
+
+        console.log(floatIndexArrayBuffer);
     }
 
     // 导出 outputJsonData 到json文件
