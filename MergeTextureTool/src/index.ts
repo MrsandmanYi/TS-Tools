@@ -46,6 +46,7 @@ function parseAtlasFile(content: string): AtlasObject {
           !line.startsWith('rotate:') &&
           !line.startsWith('pma:') &&
           !line.startsWith('bounds:') &&
+          !line.startsWith('offsets:') &&
           !line.endsWith('.png') && !line.endsWith(".jpg") && line!==''
           ){
             currentSprite = { name: line, bounds: {
@@ -87,10 +88,11 @@ function getImageTypeCount(dirPath : string) : {
             result.dirs.push(filePath);
         }
     });
+
+    result.num = result.num == 0 ? 1 : result.num;
     return result;
 }
 
-// 读取 .atlas 格式文件
 const filePath = path.resolve(__dirname, "../tex");
 
 // 拿到子文件夹
@@ -120,8 +122,6 @@ directories.forEach((dir) => {
             inputColorType: 6,
             inputHasAlpha: true
          });
-
-        // 获取子文件夹
          
 
         // 根据命名规范开始合并图片
@@ -229,13 +229,37 @@ directories.forEach((dir) => {
             }
         }
 
+        let imagePath = `./output/tex_skins_${atlasObject.imageName}`;
+        png.pack().pipe(fs.createWriteStream(imagePath));
 
-        png.pack().pipe(fs.createWriteStream(`./output/${atlasObject.imageName}`));
+        // // 读取并缩小图片大小
+        // const image = PNG.sync.read(fs.readFileSync(imagePath));
+        // const newImage = new PNG({
+        //     width: image.width / 2,
+        //     height: image.height / 2,
+        //     colorType: 6,
+        //     inputColorType: 6,
+        //     inputHasAlpha: true
+        // });
+
+        // newImage.data = new Uint8Array(newImage.width * newImage.height * 4);
+
+        // for (let x = 0; x < newImage.width; x++) {
+        //     for (let y = 0; y < newImage.height; y++) {
+        //         const i = (newImage.width * y + x) * 4;
+        //         const j = (image.width * 4 * (y * 2) + x * 2) * 4;
+        //         newImage.data[i] = image.data[j];
+        //         newImage.data[i + 1] = image.data[j + 1];
+        //         newImage.data[i + 2] = image.data[j + 2];
+        //         newImage.data[i + 3] = image.data[j + 3];
+        //     }
+        // }
+
+        // newImage.pack().pipe(fs.createWriteStream(imagePath));
+
+        
 
 
-        // 转为json格式
-        //const json = JSON.stringify(atlasObject, null, 2);
-        //console.log(json);
     }
   });
 });
