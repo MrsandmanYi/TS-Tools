@@ -27,8 +27,11 @@ function parseAtlasFile(content: string): AtlasObject {
     const atlasObject: AtlasObject = { imageName: '', imageSize: [], sprites: [] };
     let currentSprite: Sprite | null = null;
 
-    for (const line of lines) {
-        if (line.endsWith('.png')) {
+    for (let line of lines) {
+        // 去除尾部的换行符
+        line = line.replace(/[\r\n]/g, '');
+
+        if (line.endsWith('.png') || line.endsWith(".png\r")  || line.endsWith(".png\n")) {
             atlasObject.imageName = line;
             continue;
         }
@@ -47,7 +50,7 @@ function parseAtlasFile(content: string): AtlasObject {
           !line.startsWith('pma:') &&
           !line.startsWith('bounds:') &&
           !line.startsWith('offsets:') &&
-          !line.endsWith('.png') && !line.endsWith(".jpg") && line!==''
+          !(line.endsWith('.png') || line.endsWith(".png\r")  || line.endsWith(".png\n")) && !line.endsWith(".jpg") && line!==''
           ){
             currentSprite = { name: line, bounds: {
                 x: 0, y: 0, width: atlasObject.imageSize[0], height: atlasObject.imageSize[1]
@@ -230,7 +233,11 @@ directories.forEach((dir) => {
         }
 
         let imagePath = `./output/tex_skins_${atlasObject.imageName}`;
-        png.pack().pipe(fs.createWriteStream(imagePath));
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        let writeStream = fs.createWriteStream(imagePath);
+        png.pack().pipe(writeStream);
 
         // // 读取并缩小图片大小
         // const image = PNG.sync.read(fs.readFileSync(imagePath));
