@@ -43,6 +43,7 @@ function parseAtlasFile(content: string): AtlasObject {
 
         if (!line.startsWith('  ') && 
         !line.startsWith('size:') && 
+        !line.startsWith('scale:') &&
         !line.startsWith('format:') &&
          !line.startsWith('filter:') &&
           !line.startsWith('repeat:') && 
