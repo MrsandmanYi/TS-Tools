@@ -27,8 +27,11 @@ const parseArray = (str: string) => {
 
 let animNames = parseArray(params["anims"] as any);
 let filterAnim = false;
+let filterFileNameMark = "";
 if (animNames && animNames.length > 0) {
     filterAnim = true;
+    filterFileNameMark = "_";
+    filterFileNameMark += animNames.join("_");
     console.log(animNames);
 }
 
@@ -222,10 +225,10 @@ files.forEach((file) => {
                 // const uint16BufferFilePath = `./output/${imageName}_uint16.bin`;
                 // fs.writeFileSync(uint16BufferFilePath, Buffer.from(uint16Buffer.buffer));
         
-                const indexArrayFilePath = `./output/${imageName}_fIndex_binary.bin`;
+                const indexArrayFilePath = `./output/${imageName}_fIndex_binary${filterFileNameMark}.bin`;
                 fs.writeFileSync(indexArrayFilePath, Buffer.from(indexArray.buffer));
         
-                const floatIndexArrayFilePath = `./output/${imageName}_float_binary.bin`;
+                const floatIndexArrayFilePath = `./output/${imageName}_float_binary${filterFileNameMark}.bin`;
                 const floatIndexArrayBuffer = new Float32Array(floatIndexArray);
                 fs.writeFileSync(floatIndexArrayFilePath, Buffer.from(floatIndexArrayBuffer.buffer));
         
