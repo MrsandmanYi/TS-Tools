@@ -7,6 +7,7 @@
         "build": "tsc -b",
         "start": "node dist/index.js",
         "bs": "tsc -b && node dist/index.js",
+        "bs2": "tsc -b && node dist/index.js --anims=[idle]",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],

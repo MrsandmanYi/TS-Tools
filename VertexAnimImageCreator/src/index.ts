@@ -5,6 +5,32 @@ import Jimp from "jimp";
 const PNG = require('pngjs').PNG
 import { SpineVertAnimImageJson, OutputJson, ImageOutputJson, OutputAnim } from './Interfaces';
 
+// 获取命令行参数
+const args = process.argv.slice(2);
+
+// 解析参数
+const params : { [key: string]: string | boolean} = {};
+args.forEach(arg => {
+  const [key, value] = arg.split('=');
+  params[key.replace('--', '')] = value || true;
+});
+
+console.log(params);
+// [xxx, yyy, zzz] 的字符串转换为数组，去掉首尾的[]，然后用,分割
+const parseArray = (str: string) => {
+    if (!str || str.length < 2) {
+        return null;
+    }
+    const strArray = str.substring(1, str.length - 1).split(',');
+    return strArray;
+}
+
+let animNames = parseArray(params["anims"] as any);
+let filterAnim = false;
+if (animNames && animNames.length > 0) {
+    filterAnim = true;
+    console.log(animNames);
+}
 
 const dirPath = path.resolve(__dirname, "../json/");
 
@@ -35,6 +61,13 @@ files.forEach((file) => {
                 let anims = vAnimJson.animations;
                 for (let j = 0; j < anims.length; j++) {
                     let anim = anims[j];
+                    if (filterAnim && animNames && animNames.length > 0) {
+                        if (animNames.indexOf(anim.animName) < 0) {
+                            console.log(`image size skip anim: ${anim.animName}`);
+                            continue;
+                        }
+                    }
+
                     height += anim.frames.length;
                     if (j != anims.length - 1) {
                         height += GAP_FRAME; // 两个空帧
@@ -65,6 +98,13 @@ files.forEach((file) => {
                 let currentRow = 0;
                 for (let j = 0; j < anims.length; j++) {
                     let anim = anims[j];
+                    if (filterAnim && animNames && animNames.length > 0) {
+                        if (animNames.indexOf(anim.animName) < 0) {
+                            console.log(`skip anim: ${anim.animName}`);
+                            continue;
+                        }
+                    }
+
                     let outputAnim : OutputAnim = new OutputAnim();
                     outputAnim.frames.startFrameIndex = currentRow;
                     for (let k = 0; k < anim.frames.length; k++) {
